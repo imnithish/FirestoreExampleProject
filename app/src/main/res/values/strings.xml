@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Firestore Example Project</string>
+    <string name="save">Save and Publish</string>
+</resources>
