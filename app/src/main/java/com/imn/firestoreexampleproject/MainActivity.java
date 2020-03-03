@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapter() {
         Log.e("Details", "" + userList.size());
-        loadData.setAdapter(new UserAdapterr(userList));
+        loadData.setAdapter(new UserAdapter(userList));
 
     }
 }

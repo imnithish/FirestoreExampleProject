@@ -1,5 +1,6 @@
 package com.imn.firestoreexampleproject;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +32,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserAdapter.UserHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final UserAdapter.UserHolder holder, final int position) {
         holder.First.setText(list.get(position).firstName);
         holder.Last.setText(list.get(position).lastName);
         holder.Ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "GO", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(v.getContext(), DummyActivity.class);
+                intent.putExtra("first", list.get(position).firstName);
+                intent.putExtra("last", list.get(position).lastName);
+                v.getContext().startActivity(intent);
+
             }
         });
 
