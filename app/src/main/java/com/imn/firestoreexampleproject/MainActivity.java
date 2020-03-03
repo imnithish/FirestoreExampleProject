@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     Button saveAndPublish;
     Button show;
 
-    FirebaseAuth mAuth;
+//    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         show = findViewById(R.id.authoruzedTV);
         loadData = findViewById(R.id.loadData);
         loadData.setLayoutManager(new LinearLayoutManager(this));
-        mAuth = FirebaseAuth.getInstance();
+//        mAuth = FirebaseAuth.getInstance();
 
         mDatabase = FirebaseDatabase.getInstance().getReference("User");
 
@@ -57,6 +57,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                userList = new ArrayList<User>();
+                for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                    Log.e("userDetailsv2", "" + dataSnapshot2.getValue());
+                    if (dataSnapshot2.getValue() instanceof User) {
+                        User user = dataSnapshot2.getValue(User.class);
+                        userList.add(user);
+                        Log.e("userDetails", user.getFirstName() + "  " + user.getLastName());
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,14 +86,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         userList = new ArrayList<>();
+                        for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                            User user = dataSnapshot2.getValue(User.class);
+                            userList.add(user);
 
-                        for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()){
-                            if(dataSnapshot2.getValue() instanceof User) {
-                                User user = dataSnapshot2.getValue(User.class);
-                                userList.add(user);
-                            }
                         }
-                        Toast.makeText(MainActivity.this, "test", Toast.LENGTH_SHORT).show();
                         setAdapter();
                     }
 
@@ -80,12 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-
-
             }
         });
-
     }
+
 
     private void writeNewUser(String id, String firstt, String lastt) {
 
@@ -97,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapter() {
         Log.e("Details", "" + userList.size());
-        loadData.setAdapter(new UserAdapter(userList));
+        loadData.setAdapter(new UserAdapterr(userList));
 
     }
 }

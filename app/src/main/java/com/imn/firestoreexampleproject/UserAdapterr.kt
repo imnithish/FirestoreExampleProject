@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class UserAdapterr(val arrayList: ArrayList<User>) :
         RecyclerView.Adapter<UserAdapterr.UserHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserAdapterr.UserHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.user_item, parent, false)
         return UserHolder(view)
     }
@@ -21,7 +21,7 @@ class UserAdapterr(val arrayList: ArrayList<User>) :
         return arrayList.size
     }
 
-    override fun onBindViewHolder(holder: UserAdapterr.UserHolder, position: Int) {
+    override fun onBindViewHolder(holder: UserHolder, position: Int) {
         holder.First.text = arrayList[position].firstName
         holder.Last.text = arrayList[position].lastName
     }
