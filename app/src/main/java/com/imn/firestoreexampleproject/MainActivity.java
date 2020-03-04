@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,8 +34,10 @@ public class MainActivity extends AppCompatActivity {
     EditText second;
     Button saveAndPublish;
     Button show;
+    Button myUsers;
+    Button logOut;
 
-//    FirebaseAuth mAuth;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +49,12 @@ public class MainActivity extends AppCompatActivity {
         saveAndPublish = findViewById(R.id.continueBt);
         show = findViewById(R.id.authoruzedTV);
         loadData = findViewById(R.id.loadData);
+
+        myUsers = findViewById(R.id.myusers);
+        logOut = findViewById(R.id.logout);
         loadData.setLayoutManager(new LinearLayoutManager(this));
-//        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference("User");
 
@@ -88,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         userList = new ArrayList<>();
                         for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
                             User user = dataSnapshot2.getValue(User.class);
+                            if(user.getUserID().equals(mAuth.getUid()))
                             userList.add(user);
 
                         }
@@ -101,12 +111,25 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mAuth.getInstance().signOut();
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("myPrefs2", Context.MODE_PRIVATE);
+                pref.edit().clear().commit();
+                startActivity(new Intent(MainActivity.this, GetInActivity.class));
+
+            }
+        });
     }
 
 
     private void writeNewUser(String id, String firstt, String lastt) {
 
-        User user = new User(firstt, lastt);
+        User user = new User(firstt, lastt,mAuth.getUid());
         mDatabase.child(id).setValue(user);
 
 

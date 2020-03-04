@@ -5,10 +5,20 @@ import java.io.Serializable;
 public class User implements Serializable {
     String firstName;
     String lastName;
+    String userID;
 
-    public User(String firstName, String lastName) {
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public User(String firstName, String lastName, String userID) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.userID = userID;
     }
 
     public User(){

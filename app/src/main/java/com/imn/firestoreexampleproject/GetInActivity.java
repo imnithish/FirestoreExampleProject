@@ -95,6 +95,8 @@ public class GetInActivity extends AppCompatActivity {
 
         Otp.setVisibility(View.VISIBLE);
         GetIn.setVisibility(View.VISIBLE);
+        GetOtp.setVisibility(View.INVISIBLE);
+
 
         String phoneNumber2 = "+91" + phoneNumber;
 

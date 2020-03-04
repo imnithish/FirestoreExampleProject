@@ -37,8 +37,20 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/loadData"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/user_item"/>
+        android:layout_height="200dp"
+        tools:listitem="@layout/user_item" />
+
+    <Button
+        android:id="@+id/myusers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="myuserss" />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="logout" />
 
 
 </LinearLayout>
