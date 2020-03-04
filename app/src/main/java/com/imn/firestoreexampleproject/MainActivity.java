@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         userList = new ArrayList<>();
                         for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
                             User user = dataSnapshot2.getValue(User.class);
-                            if(user.getUserID().equals(mAuth.getUid()))
+//                            if(user.getUserID().equals(mAuth.getUid()))
                             userList.add(user);
 
                         }
@@ -122,6 +122,13 @@ public class MainActivity extends AppCompatActivity {
                 pref.edit().clear().commit();
                 startActivity(new Intent(MainActivity.this, GetInActivity.class));
 
+            }
+        });
+
+        myUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, MyUsers.class));
             }
         });
     }

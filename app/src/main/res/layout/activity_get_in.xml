@@ -71,7 +71,7 @@
                 android:textColorHint="@color/black"
                 android:textSize="25dp"
                 android:textStyle="italic"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonGetIn"
@@ -82,7 +82,7 @@
                 android:text="GO RIDING!!"
                 android:textColor="@color/black"
                 android:textSize="40dp"
-                android:visibility="invisible"
+                android:visibility="visible"
                 app:cornerRadius="20dp"
                 app:rippleColor="@color/darko" />
 
