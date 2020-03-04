@@ -25,7 +25,6 @@ public class MyUsers extends AppCompatActivity {
     private DatabaseReference mDatabase;
 
     FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +37,6 @@ public class MyUsers extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("User");
-
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -63,6 +61,7 @@ public class MyUsers extends AppCompatActivity {
     }
 
     private void setAdapter() {
-        loadUsers.setAdapter(new MyUserAdapter(getApplicationContext(), userList));
+
+        loadUsers.setAdapter(new MyUserAdapter(userList));
     }
 }

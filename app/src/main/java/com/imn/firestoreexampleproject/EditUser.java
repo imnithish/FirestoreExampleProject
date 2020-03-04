@@ -1,5 +1,6 @@
 package com.imn.firestoreexampleproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -23,7 +25,7 @@ public class EditUser extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     FirebaseAuth mAuth;
-    private String id;
+    private String key;
 
 
     @Override
@@ -42,6 +44,8 @@ public class EditUser extends AppCompatActivity {
 
         Intent intentt = getIntent();
 
+        key = intentt.getStringExtra("keyy");
+        Toast.makeText(this, key, Toast.LENGTH_SHORT).show();
         editFirstName.setText(intentt.getStringExtra("firstt"));
         editLastName.setText(intentt.getStringExtra("lastt"));
 
@@ -49,26 +53,50 @@ public class EditUser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                id = mDatabase.push().getKey();
-                updateUser(id, editFirstName.getText().toString(), editLastName.getText().toString());
-                Toast.makeText(EditUser.this, "updated", Toast.LENGTH_SHORT).show();
+                updateUser(key, editFirstName.getText().toString(), editLastName.getText().toString());
+
             }
         });
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(EditUser.this, "deleted", Toast.LENGTH_SHORT).show();
+
+                deleteUser(key);
             }
         });
     }
 
-    private void updateUser(String id, String toString, String toString1) {
-        User user = new User(toString, toString1, mAuth.getUid());
-        mDatabase.child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+    private void deleteUser(String key) {
+
+        mDatabase.child(key).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                Toast.makeText(EditUser.this, "deleted", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(EditUser.this, MyUsers.class));
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(EditUser.this, "something is  wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void updateUser(String key, String toString, String toString1) {
+        User user = new User(toString, toString1, mAuth.getUid(), key);
+        mDatabase.child(key).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(EditUser.this, "updated", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(EditUser.this, MyUsers.class));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(EditUser.this, "something is  wrong", Toast.LENGTH_SHORT).show();
             }
         });
 

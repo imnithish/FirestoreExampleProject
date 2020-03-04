@@ -6,6 +6,26 @@ public class User implements Serializable {
     String firstName;
     String lastName;
     String userID;
+    String key;
+
+
+    public User(String firstName, String lastName, String userID, String key) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userID = userID;
+        this.key = key;
+    }
+
+    public User() {
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public String getUserID() {
         return userID;
@@ -14,17 +34,6 @@ public class User implements Serializable {
     public void setUserID(String userID) {
         this.userID = userID;
     }
-
-    public User(String firstName, String lastName, String userID) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userID = userID;
-    }
-
-    public User(){
-
-    }
-
 
     public String getFirstName() {
         return firstName;

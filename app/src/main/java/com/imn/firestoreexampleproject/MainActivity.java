@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     Button show;
     Button myUsers;
     Button logOut;
+    private String key;
 
     FirebaseAuth mAuth;
 
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         saveAndPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mDatabase.push().getKey();
-                writeNewUser(id, first.getText().toString(), second.getText().toString());
+                key = mDatabase.push().getKey();
+                writeNewUser(key, first.getText().toString(), second.getText().toString());
             }
         });
 
@@ -134,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void writeNewUser(String id, String firstt, String lastt) {
+    private void writeNewUser(String key, String firstt, String lastt) {
 
-        User user = new User(firstt, lastt,mAuth.getUid());
-        mDatabase.child(id).setValue(user);
+        User user = new User(firstt, lastt,mAuth.getUid(), key);
+        mDatabase.child(key).setValue(user);
 
 
     }

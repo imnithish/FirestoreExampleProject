@@ -17,11 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MyUserAdapter extends RecyclerView.Adapter<MyUserAdapter.MyUserHolder> {
 
     private ArrayList<User> list;
-    Context context;
 
-    public MyUserAdapter(Context context, ArrayList<User> list) {
-        this.context = context;
+    public MyUserAdapter(ArrayList<User> list) {
         this.list = list;
+
     }
 
     @NonNull
@@ -40,11 +39,13 @@ public class MyUserAdapter extends RecyclerView.Adapter<MyUserAdapter.MyUserHold
         holder.Ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), "GO", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(v.getContext(), "GO", Toast.LENGTH_SHORT).show();
                 Intent intentt = new Intent(v.getContext(), EditUser.class);
+                intentt.putExtra("keyy", list.get(position).key);
                 intentt.putExtra("firstt", list.get(position).firstName);
                 intentt.putExtra("lastt", list.get(position).lastName);
                 v.getContext().startActivity(intentt);
+
 
             }
         });
