@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -16,8 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
 
+    private Context context;
     private ArrayList<User> list;
-    public UserAdapter(ArrayList<User> list) {
+    public UserAdapter(Context context, ArrayList<User> list) {
+        this.context = context;
         this.list = list;
     }
 
@@ -35,6 +40,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
     public void onBindViewHolder(@NonNull final UserAdapter.UserHolder holder, final int position) {
         holder.First.setText(list.get(position).firstName);
         holder.Last.setText(list.get(position).lastName);
+
+        Glide.with(context).load(list.get(position).imageUrl).into(holder.imageView);
+
         holder.Ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,12 +67,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
         public TextView First;
         public TextView Last;
         public LinearLayout Ll;
+        public ImageView imageView;
 
         public UserHolder(View itemView) {
             super(itemView);
             this.First = itemView.findViewById(R.id.first);
             this.Last = itemView.findViewById(R.id.last);
             this.Ll = itemView.findViewById(R.id.ll);
+            this.imageView = itemView.findViewById(R.id.recyclerimage);
         }
     }
 

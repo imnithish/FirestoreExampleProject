@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.dynamic.IFragmentWrapper;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -65,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseStorage storage;
     StorageReference storageReference;
-    String imageUrl;
+    String imageUrl = "null";
+    UploadTask uploadTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 uploadImage();
-                key = mDatabase.push().getKey();
-                writeNewUser(key, first.getText().toString(), second.getText().toString());
             }
         });
 
@@ -184,28 +185,30 @@ public class MainActivity extends AppCompatActivity {
                     .child(
                             "images/"
                                     + UUID.randomUUID().toString());
+            uploadTask = ref.putFile(selectedfile);
 
             // adding listeners on upload
             // or failure of image
-            ref.putFile(selectedfile)
-                    .addOnSuccessListener(
-                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            uploadTask.addOnSuccessListener(
+                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-                                @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot) {
-                                    // Image uploaded successfully
-                                    // Dismiss dialog
-                                    progressDialog.dismiss();
-                                    Toast
-                                            .makeText(MainActivity.this,
-                                                    "Image Uploaded!!",
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
+                        @Override
+                        public void onSuccess(
+                                UploadTask.TaskSnapshot taskSnapshot) {
+
+                            // Image uploaded successfully
+                            // Dismiss dialog
+                            progressDialog.dismiss();
+                            Toast
+                                    .makeText(MainActivity.this,
+                                            "Image Uploaded!!",
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+
 
 //                                    Log.i("imageurl","imageurl: "+imageUrl);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
 
@@ -235,13 +238,41 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return ref.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        imageUrl = String.valueOf(downloadUri);
+                        Log.i("image url", "url: " + imageUrl);
+
+                        key = mDatabase.push().getKey();
+                        writeNewUser(key, first.getText().toString(), second.getText().toString(), imageUrl);
+                    } else {
+                        // Handle failures
+                        // ...
+                    }
+                }
+            });
+
         }
     }
 
 
-    private void writeNewUser(String key, String firstt, String lastt) {
+    private void writeNewUser(String key, String firstt, String lastt, String imageUrl) {
 
-        User user = new User(firstt, lastt, mAuth.getUid(), key);
+        Log.i("image url on push", "url: " + imageUrl);
+        User user = new User(firstt, lastt, mAuth.getUid(), key, imageUrl);
         mDatabase.child(key).setValue(user);
 
 
@@ -249,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapter() {
         Log.e("Details", "" + userList.size());
-        loadData.setAdapter(new UserAdapter(userList));
+        loadData.setAdapter(new UserAdapter(getApplicationContext(), userList));
 
     }
 

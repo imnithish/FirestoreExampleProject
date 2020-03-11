@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -36,14 +38,17 @@ public class MyUserAdapter extends RecyclerView.Adapter<MyUserAdapter.MyUserHold
         holder.First.setText(list.get(position).firstName);
         holder.Last.setText(list.get(position).lastName);
 
+
         holder.Ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(v.getContext(), "GO", Toast.LENGTH_SHORT).show();
+
+
                 Intent intentt = new Intent(v.getContext(), EditUser.class);
                 intentt.putExtra("keyy", list.get(position).key);
                 intentt.putExtra("firstt", list.get(position).firstName);
                 intentt.putExtra("lastt", list.get(position).lastName);
+                intentt.putExtra("imageurl", list.get(position).imageUrl);
                 v.getContext().startActivity(intentt);
 
 

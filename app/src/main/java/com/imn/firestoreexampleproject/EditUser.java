@@ -22,6 +22,7 @@ public class EditUser extends AppCompatActivity {
     EditText editLastName;
     Button update;
     Button delete;
+    String imageurl;
 
     private DatabaseReference mDatabase;
     FirebaseAuth mAuth;
@@ -48,6 +49,7 @@ public class EditUser extends AppCompatActivity {
         Toast.makeText(this, key, Toast.LENGTH_SHORT).show();
         editFirstName.setText(intentt.getStringExtra("firstt"));
         editLastName.setText(intentt.getStringExtra("lastt"));
+        imageurl = intentt.getStringExtra("imageurl");
 
         update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +88,7 @@ public class EditUser extends AppCompatActivity {
     }
 
     private void updateUser(String key, String toString, String toString1) {
-        User user = new User(toString, toString1, mAuth.getUid(), key);
+        User user = new User(toString, toString1, mAuth.getUid(), key, imageurl);
         mDatabase.child(key).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
