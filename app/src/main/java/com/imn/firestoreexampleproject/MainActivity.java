@@ -2,28 +2,47 @@ package com.imn.firestoreexampleproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.dynamic.IFragmentWrapper;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
@@ -37,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
     Button myUsers;
     Button logOut;
     private String key;
-
     FirebaseAuth mAuth;
 
+    Button selectImage;
+    ImageView imagePreview;
+    String imageUri;
+    Uri selectedfile;
+
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    String imageUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,63 +79,72 @@ public class MainActivity extends AppCompatActivity {
 
         myUsers = findViewById(R.id.myusers);
         logOut = findViewById(R.id.logout);
+
+        selectImage = findViewById(R.id.selectimage);
+        imagePreview = findViewById(R.id.imagepreview);
         loadData.setLayoutManager(new LinearLayoutManager(this));
         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference("User");
 
+
+        selectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent()
+                        .setType("image/*")
+                        .setAction(Intent.ACTION_OPEN_DOCUMENT);
+                startActivityForResult(Intent.createChooser(intent, "Select a file"), 123);
+
+            }
+        });
+
+
         saveAndPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                uploadImage();
                 key = mDatabase.push().getKey();
                 writeNewUser(key, first.getText().toString(), second.getText().toString());
             }
         });
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
+
+        final ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                userList = new ArrayList<User>();
-                for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
-                    Log.e("userDetailsv2", "" + dataSnapshot2.getValue());
-                    if (dataSnapshot2.getValue() instanceof User) {
-                        User user = dataSnapshot2.getValue(User.class);
-                        userList.add(user);
-                        Log.e("userDetails", user.getFirstName() + "  " + user.getLastName());
 
-                    }
+                userList = new ArrayList<>();
+                for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+                    User user = dataSnapshot2.getValue(User.class);
+//                            if(user.getUserID().equals(mAuth.getUid()))
+                    userList.add(user);
+
                 }
+                setAdapter();
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
 
 
         show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDatabase.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        userList = new ArrayList<>();
-                        for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
-                            User user = dataSnapshot2.getValue(User.class);
-//                            if(user.getUserID().equals(mAuth.getUid()))
-                            userList.add(user);
 
-                        }
-                        setAdapter();
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                Query query = FirebaseDatabase.getInstance().getReference("User")
+                        .orderByChild("lastName");
+                query.addListenerForSingleValueEvent(valueEventListener);
 
-                    }
-                });
+
             }
         });
 
@@ -134,10 +169,79 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void uploadImage() {
+        if (selectedfile != null) {
+            // Code for showing progressDialog while uploading
+            final ProgressDialog progressDialog
+                    = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+
+
+            // Defining the child of storageReference
+            final StorageReference ref
+                    = storageReference
+                    .child(
+                            "images/"
+                                    + UUID.randomUUID().toString());
+
+            // adding listeners on upload
+            // or failure of image
+            ref.putFile(selectedfile)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    // Image uploaded successfully
+                                    // Dismiss dialog
+                                    progressDialog.dismiss();
+                                    Toast
+                                            .makeText(MainActivity.this,
+                                                    "Image Uploaded!!",
+                                                    Toast.LENGTH_SHORT)
+                                            .show();
+
+//                                    Log.i("imageurl","imageurl: "+imageUrl);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                    // Error, Image not uploaded
+                    progressDialog.dismiss();
+                    Toast
+                            .makeText(MainActivity.this,
+                                    "Failed " + e.getMessage(),
+                                    Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }).addOnProgressListener(
+                    new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                        // Progress Listener for loading
+                        // percentage on the dialog box
+                        @Override
+                        public void onProgress(
+                                UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress
+                                    = (100.0
+                                    * taskSnapshot.getBytesTransferred()
+                                    / taskSnapshot.getTotalByteCount());
+                            progressDialog.setMessage(
+                                    "Uploaded "
+                                            + (int) progress + "%");
+                        }
+                    });
+
+        }
+    }
+
 
     private void writeNewUser(String key, String firstt, String lastt) {
 
-        User user = new User(firstt, lastt,mAuth.getUid(), key);
+        User user = new User(firstt, lastt, mAuth.getUid(), key);
         mDatabase.child(key).setValue(user);
 
 
@@ -147,5 +251,25 @@ public class MainActivity extends AppCompatActivity {
         Log.e("Details", "" + userList.size());
         loadData.setAdapter(new UserAdapter(userList));
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 123 && resultCode == RESULT_OK) {
+            selectedfile = data.getData(); //The uri with the location of the file
+            imageUri = selectedfile.toString();
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedfile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
+            roundedBitmapDrawable.setCircular(true);
+            imagePreview.setImageDrawable(roundedBitmapDrawable);
+
+        }
     }
 }
