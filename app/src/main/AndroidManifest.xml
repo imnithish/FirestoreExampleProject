@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.imn.firestoreexampleproject">
+    package="com.imnstudios.firestoreexampleproject">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -19,11 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".EditUser"></activity>
-        <activity android:name=".MyUsers" />
-        <activity android:name=".DummyActivity" />
+        <activity android:name="com.imnstudios.firestoreexampleproject.EditUser"></activity>
+        <activity android:name="com.imnstudios.firestoreexampleproject.MyUsers" />
+        <activity android:name="com.imnstudios.firestoreexampleproject.dummy.DummyActivity" />
         <activity
-            android:name=".GetInActivity"
+            android:name="com.imnstudios.firestoreexampleproject.GetInActivity"
             android:theme="@style/Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="com.imnstudios.firestoreexampleproject.MainActivity" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.imn.firestoreexampleproject;
+package com.imnstudios.firestoreexampleproject;
 
 import java.io.Serializable;
 

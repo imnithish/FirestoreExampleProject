@@ -1,10 +1,12 @@
-package com.imn.firestoreexampleproject;
+package com.imnstudios.firestoreexampleproject.dummy;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.imnstudios.firestoreexampleproject.R;
 
 public class DummyActivity extends AppCompatActivity {
 
